@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PouchCo – Stationery Pouches for Students</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --cream: #fdf6ec;
+    --amber: #e07b2a;
+    --amber-light: #f5a64a;
+    --amber-pale: #fef0dd;
+    --teal: #2a7b6f;
+    --teal-light: #3ab49e;
+    --sand: #f0e4d0;
+    --white: #ffffff;
+    --gray: #7a6f62;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 5vw;
+    background: rgba(253,246,236,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(224,123,42,0.15);
+    transition: box-shadow .3s;
+  }
+  nav.scrolled { box-shadow: 0 4px 24px rgba(26,18,8,.08); }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--amber);
+    letter-spacing: -.5px;
+  }
+  .nav-logo span { color: var(--ink); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    text-decoration: none; font-size: .9rem; font-weight: 500;
+    color: var(--ink); letter-spacing: .02em;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--amber); }
+  .nav-cta {
+    background: var(--amber); color: #fff;
+    padding: .55rem 1.4rem; border-radius: 50px;
+    font-size: .85rem; font-weight: 600;
+    text-decoration: none; letter-spacing: .04em;
+    transition: background .2s, transform .15s;
+  }
+  .nav-cta:hover { background: var(--amber-light); transform: translateY(-1px); }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 24px; height: 2px; background: var(--ink); border-radius: 2px; transition: .3s; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 8rem 5vw 5rem;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 70% 80% at 60% 40%, #fbe8cc 0%, var(--cream) 70%);
+  }
+  .hero-decor {
+    position: absolute; right: -80px; top: -80px;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: conic-gradient(from 180deg, #e07b2a22, #2a7b6f11, #e07b2a22);
+    animation: spin 20s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hero-text { position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: var(--amber-pale); border: 1px solid #e07b2a44;
+    padding: .35rem .9rem; border-radius: 50px;
+    font-size: .8rem; font-weight: 600; color: var(--amber);
+    letter-spacing: .06em; text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    animation: fadeUp .6s ease both;
+  }
+  .hero-badge::before { content: '✦'; }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 5vw, 4.2rem);
+    font-weight: 900; line-height: 1.1;
+    color: var(--ink);
+    animation: fadeUp .7s .1s ease both;
+  }
+  h1 em { color: var(--amber); font-style: normal; }
+  .hero-sub {
+    margin-top: 1.2rem; max-width: 440px;
+    font-size: 1.05rem; line-height: 1.75; color: var(--gray);
+    font-weight: 300;
+    animation: fadeUp .7s .2s ease both;
+  }
+  .hero-actions {
+    display: flex; gap: 1rem; align-items: center; margin-top: 2.2rem; flex-wrap: wrap;
+    animation: fadeUp .7s .3s ease both;
+  }
+  .btn-primary {
+    background: var(--amber); color: #fff;
+    padding: .9rem 2rem; border-radius: 50px;
+    font-size: 1rem; font-weight: 600;
+    text-decoration: none; letter-spacing: .02em;
+    transition: all .2s; box-shadow: 0 6px 20px rgba(224,123,42,.35);
+    display: inline-flex; align-items: center; gap: .5rem;
+  }
+  .btn-primary:hover { background: var(--amber-light); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(224,123,42,.45); }
+  .btn-secondary {
+    color: var(--ink); font-size: .95rem; font-weight: 500;
+    text-decoration: none; display: inline-flex; align-items: center; gap: .4rem;
+    transition: color .2s;
+  }
+  .btn-secondary:hover { color: var(--amber); }
+  .btn-secondary::after { content: '→'; }
+
+  .hero-stats {
+    display: flex; gap: 2rem; margin-top: 3rem;
+    animation: fadeUp .7s .4s ease both;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 700; color: var(--ink);
+  }
+  .stat-label { font-size: .78rem; color: var(--gray); font-weight: 500; letter-spacing: .04em; }
+
+  /* Hero visual */
+  .hero-visual {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeUp .8s .2s ease both;
+  }
+  .pouch-showcase {
+    position: relative; width: 380px; height: 380px;
+  }
+  .pouch-card-big {
+    width: 300px; height: 300px; border-radius: 30px;
+    background: linear-gradient(135deg, #e07b2a, #f5a64a);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 6rem;
+    box-shadow: 0 30px 60px rgba(224,123,42,.35);
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translate(-50%,-54%)} 50%{transform:translate(-50%,-46%)} }
+  .badge-float {
+    position: absolute; background: #fff;
+    border-radius: 16px; padding: .6rem 1rem;
+    font-size: .8rem; font-weight: 600; color: var(--ink);
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    display: flex; align-items: center; gap: .4rem;
+    white-space: nowrap;
+  }
+  .badge-float.b1 { top: 10px; right: 10px; animation: floatB 3.5s ease-in-out infinite; }
+  .badge-float.b2 { bottom: 30px; left: 0px; animation: floatB 3.5s .8s ease-in-out infinite; }
+  .badge-float.b3 { top: 50%; right: -10px; animation: floatB 3.5s .4s ease-in-out infinite; }
+  @keyframes floatB { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 6rem 5vw; }
+  .section-label {
+    font-size: .78rem; font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--amber);
+    margin-bottom: .6rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 700;
+    line-height: 1.2; color: var(--ink);
+    margin-bottom: 1rem;
+  }
+  .section-sub { font-size: 1rem; color: var(--gray); line-height: 1.7; max-width: 520px; }
+
+  /* ── FEATURES ── */
+  #features { background: var(--ink); }
+  #features .section-label { color: var(--amber-light); }
+  #features .section-title { color: var(--cream); }
+  #features .section-sub { color: #a89e92; }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem; margin-top: 3.5rem;
+  }
+  .feature-card {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 20px; padding: 2rem;
+    transition: background .3s, transform .3s;
+    position: relative; overflow: hidden;
+  }
+  .feature-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(224,123,42,.1), transparent);
+    opacity: 0; transition: opacity .3s;
+  }
+  .feature-card:hover { transform: translateY(-4px); background: rgba(255,255,255,.08); }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .feature-card h3 { color: var(--cream); font-size: 1.05rem; margin-bottom: .5rem; }
+  .feature-card p { color: #a89e92; font-size: .9rem; line-height: 1.6; }
+
+  /* ── PRODUCTS ── */
+  #products {}
+  .products-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 3.5rem; }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 2rem; }
+
+  .product-card {
+    background: var(--white); border-radius: 24px;
+    overflow: hidden; position: relative;
+    box-shadow: 0 4px 20px rgba(26,18,8,.07);
+    transition: transform .3s, box-shadow .3s;
+  }
+  .product-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(26,18,8,.13); }
+  .product-card.featured { border: 2px solid var(--amber); }
+  .product-img {
+    height: 220px; display: flex; align-items: center; justify-content: center;
+    font-size: 5rem; position: relative;
+  }
+  .product-img.bg1 { background: linear-gradient(135deg, #fef0dd, #fad9a8); }
+  .product-img.bg2 { background: linear-gradient(135deg, #d4eee9, #a8ddd5); }
+  .product-img.bg3 { background: linear-gradient(135deg, #e8d4f0, #c9a8e0); }
+  .product-img.bg4 { background: linear-gradient(135deg, #d4e8f0, #a8cfe0); }
+  .bestseller-tag {
+    position: absolute; top: 14px; right: 14px;
+    background: var(--amber); color: #fff;
+    font-size: .72rem; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; padding: .3rem .75rem; border-radius: 50px;
+  }
+  .product-body { padding: 1.5rem; }
+  .product-type { font-size: .75rem; color: var(--gray); font-weight: 500; letter-spacing: .05em; text-transform: uppercase; margin-bottom: .3rem; }
+  .product-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: .6rem; }
+  .product-desc { font-size: .88rem; color: var(--gray); line-height: 1.6; margin-bottom: 1.2rem; }
+  .product-tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.2rem; }
+  .tag {
+    background: var(--amber-pale); color: var(--amber);
+    font-size: .72rem; font-weight: 600; padding: .25rem .65rem; border-radius: 50px;
+  }
+  .product-footer { display: flex; align-items: center; justify-content: space-between; }
+  .price { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--ink); }
+  .price span { font-size: .85rem; color: var(--gray); font-family: 'DM Sans', sans-serif; font-weight: 400; }
+  .add-btn {
+    background: var(--ink); color: var(--cream);
+    padding: .55rem 1.1rem; border-radius: 50px;
+    font-size: .82rem; font-weight: 600; border: none; cursor: pointer;
+    transition: background .2s, transform .15s;
+    display: flex; align-items: center; gap: .3rem;
+  }
+  .add-btn:hover { background: var(--amber); transform: scale(1.03); }
+
+  /* ── WHY US ── */
+  #why { background: var(--sand); }
+  .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .why-visual {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  }
+  .why-tile {
+    border-radius: 20px; padding: 1.5rem;
+    display: flex; flex-direction: column; gap: .5rem;
+  }
+  .why-tile.t1 { background: var(--amber); color: #fff; grid-row: span 2; justify-content: center; }
+  .why-tile.t2 { background: var(--teal); color: #fff; }
+  .why-tile.t3 { background: var(--ink); color: var(--cream); }
+  .why-tile .big { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; }
+  .why-tile .small { font-size: .82rem; opacity: .8; }
+  .why-tile .icon { font-size: 1.6rem; }
+  .why-points { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2.5rem; }
+  .why-point { display: flex; gap: 1rem; align-items: flex-start; }
+  .why-dot {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: var(--amber-pale); display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+  .why-point h4 { font-size: .95rem; font-weight: 600; margin-bottom: .2rem; }
+  .why-point p { font-size: .85rem; color: var(--gray); line-height: 1.6; }
+
+  /* ── TESTIMONIALS ── */
+  #reviews { overflow: hidden; }
+  .review-track { display: flex; gap: 1.5rem; animation: slideTrack 30s linear infinite; width: max-content; }
+  @keyframes slideTrack { to { transform: translateX(-50%); } }
+  .review-card {
+    background: var(--white); border-radius: 20px; padding: 1.8rem;
+    width: 300px; flex-shrink: 0; border: 1px solid #ede4d8;
+  }
+  .review-stars { color: var(--amber); font-size: 1rem; margin-bottom: .8rem; letter-spacing: 2px; }
+  .review-text { font-size: .9rem; color: var(--gray); line-height: 1.7; margin-bottom: 1rem; }
+  .reviewer { display: flex; align-items: center; gap: .7rem; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; font-weight: 700; color: #fff;
+  }
+  .reviewer-name { font-size: .85rem; font-weight: 600; }
+  .reviewer-role { font-size: .75rem; color: var(--gray); }
+
+  /* ── CTA BANNER ── */
+  #cta {
+    background: linear-gradient(135deg, var(--amber) 0%, #c96a18 100%);
+    text-align: center; padding: 6rem 5vw; position: relative; overflow: hidden;
+  }
+  #cta::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  #cta h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; color: #fff;
+    margin-bottom: 1rem; position: relative;
+  }
+  #cta p { color: rgba(255,255,255,.8); font-size: 1.05rem; margin-bottom: 2.5rem; position: relative; }
+  .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; }
+  .btn-white {
+    background: #fff; color: var(--amber);
+    padding: .9rem 2.2rem; border-radius: 50px;
+    font-size: 1rem; font-weight: 700; text-decoration: none;
+    transition: all .2s; box-shadow: 0 6px 20px rgba(0,0,0,.15);
+    display: inline-flex; align-items: center; gap: .5rem;
+  }
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,.25); }
+  .btn-outline-white {
+    border: 2px solid rgba(255,255,255,.6); color: #fff;
+    padding: .9rem 2.2rem; border-radius: 50px;
+    font-size: 1rem; font-weight: 600; text-decoration: none;
+    transition: all .2s;
+    display: inline-flex; align-items: center; gap: .5rem;
+  }
+  .btn-outline-white:hover { background: rgba(255,255,255,.1); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink); color: var(--cream);
+    padding: 4rem 5vw 2rem;
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+  .footer-brand { }
+  .footer-logo {
+    font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900;
+    color: var(--amber); margin-bottom: .8rem;
+  }
+  .footer-brand p { font-size: .88rem; color: #a89e92; line-height: 1.7; max-width: 260px; }
+  .footer-col h4 { font-size: .85rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--cream); margin-bottom: 1rem; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+  .footer-col ul li a { color: #a89e92; text-decoration: none; font-size: .88rem; transition: color .2s; }
+  .footer-col ul li a:hover { color: var(--amber-light); }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,.08); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; }
+  .footer-bottom p { font-size: .8rem; color: #7a6f62; }
+  .social-links { display: flex; gap: .8rem; }
+  .social-links a {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255,255,255,.07); display: flex; align-items: center; justify-content: center;
+    color: #a89e92; text-decoration: none; font-size: .85rem;
+    transition: background .2s, color .2s;
+  }
+  .social-links a:hover { background: var(--amber); color: #fff; }
+
+  /* ── MOBILE MENU ── */
+  .mobile-menu {
+    display: none; position: fixed; inset: 0; z-index: 99;
+    background: var(--cream); flex-direction: column;
+    align-items: center; justify-content: center; gap: 2rem;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700;
+    color: var(--ink); text-decoration: none; transition: color .2s;
+  }
+  .mobile-menu a:hover { color: var(--amber); }
+  .menu-close {
+    position: absolute; top: 1.5rem; right: 5vw;
+    font-size: 2rem; cursor: pointer; color: var(--ink);
+    background: none; border: none;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--ink); color: #fff;
+    padding: .75rem 1.5rem; border-radius: 50px;
+    font-size: .9rem; font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    transition: transform .4s; z-index: 999;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    #hero { grid-template-columns: 1fr; text-align: center; padding-top: 7rem; }
+    .hero-sub { margin: 1rem auto 0; }
+    .hero-actions { justify-content: center; }
+    .hero-stats { justify-content: center; }
+    .hero-visual { margin-top: 3rem; }
+    .why-grid { grid-template-columns: 1fr; }
+    .why-visual { order: -1; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .nav-links, .nav-cta { display: none; }
+    .hamburger { display: flex; }
+    .pouch-showcase { width: 280px; height: 280px; }
+    .pouch-card-big { width: 200px; height: 200px; font-size: 4rem; }
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo">Pouch<span>Co</span></div>
+  <ul class="nav-links">
+    <li><a href="#products">Products</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+  </ul>
+  <a href="#products" class="nav-cta">Shop Now →</a>
+  <div class="hamburger" onclick="openMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="menu-close" onclick="closeMenu()">✕</button>
+  <a href="#products" onclick="closeMenu()">Products</a>
+  <a href="#features" onclick="closeMenu()">Features</a>
+  <a href="#why" onclick="closeMenu()">Why Us</a>
+  <a href="#reviews" onclick="closeMenu()">Reviews</a>
+  <a href="#products" class="btn-primary" onclick="closeMenu()">Shop Now →</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-decor"></div>
+
+  <div class="hero-text">
+    <div class="hero-badge">New Collection 2025</div>
+    <h1>Your <em>Study Buddy</em><br>Starts Here</h1>
+    <p class="hero-sub">Durable, stylish, and perfectly sized stationery pouches — designed for students who mean business. Keep every pen, pencil, and eraser exactly where it belongs.</p>
+    <div class="hero-actions">
+      <a href="#products" class="btn-primary">🛍️ Shop Now</a>
+      <a href="#features" class="btn-secondary">See Features</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">500+</div>
+        <div class="stat-label">Happy Students</div>
+      </div>
+      <div>
+        <div class="stat-num">4</div>
+        <div class="stat-label">Pouch Styles</div>
+      </div>
+      <div>
+        <div class="stat-num">★ 4.8</div>
+        <div class="stat-label">Avg Rating</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="pouch-showcase">
+      <div class="pouch-card-big">🎒</div>
+      <div class="badge-float b1">✦ Water Resistant</div>
+      <div class="badge-float b2">✦ Starting ₹50</div>
+      <div class="badge-float b3">✦ 4+ Designs</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Why students love us</div>
+  <div class="section-title" style="color:var(--cream)">Built for<br>the real classroom</div>
+  <p class="section-sub" style="color:#a89e92">Every detail is designed to handle daily drops, spills, and backpack chaos.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">💧</div>
+      <h3>Water Resistant</h3>
+      <p>Made from durable PVC plastic — spills and rain won't ruin your stationery ever again.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🪶</div>
+      <h3>Ultra Lightweight</h3>
+      <p>Barely adds weight to your bag, so you can carry it everywhere without the extra burden.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎨</div>
+      <h3>Fun Designs</h3>
+      <p>From transparent styles to trendy prints — pick one that matches your vibe and personality.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <h3>Secure Zipper</h3>
+      <p>Smooth, strong zipper closure keeps everything safely tucked in, no matter how packed your bag is.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📐</div>
+      <h3>Spacious Interior</h3>
+      <p>Holds pens, pencils, rulers, erasers, sharpeners and more — organized and always at hand.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💰</div>
+      <h3>Student-Friendly Price</h3>
+      <p>Quality stationery storage that won't drain your pocket money — starting at just ₹50.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="products-header">
+    <div>
+      <div class="section-label">Our Collection</div>
+      <div class="section-title">Pick Your<br>Perfect Pouch</div>
+    </div>
+    <p class="section-sub">All pouches available for online delivery. Free shipping on orders above ₹199.</p>
+  </div>
+  <div class="products-grid">
+
+    <div class="product-card">
+      <div class="product-img bg1">
+        <span>🗂️</span>
+      </div>
+      <div class="product-body">
+        <div class="product-type">Classic</div>
+        <div class="product-name">Transparent Pouch</div>
+        <p class="product-desc">See-through design so you always know what's inside. Simple, clean, and practical for everyday use.</p>
+        <div class="product-tags">
+          <span class="tag">PVC Material</span>
+          <span class="tag">Zipper Lock</span>
+          <span class="tag">Lightweight</span>
+        </div>
+        <div class="product-footer">
+          <div class="price">₹50–₹60 <span>/ piece</span></div>
+          <button class="add-btn" onclick="addToCart('Transparent Pouch')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card featured">
+      <div class="product-img bg2">
+        <span>🖊️</span>
+        <div class="bestseller-tag">Bestseller</div>
+      </div>
+      <div class="product-body">
+        <div class="product-type">Popular</div>
+        <div class="product-name">Printed Pouch</div>
+        <p class="product-desc">Vibrant prints and cartoon themes that make your stationery stand out. Express your style!</p>
+        <div class="product-tags">
+          <span class="tag">Fun Prints</span>
+          <span class="tag">Zipper Lock</span>
+          <span class="tag">Durable</span>
+        </div>
+        <div class="product-footer">
+          <div class="price">₹79–₹89 <span>/ piece</span></div>
+          <button class="add-btn" onclick="addToCart('Printed Pouch')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img bg3">
+        <span>📦</span>
+      </div>
+      <div class="product-body">
+        <div class="product-type">Premium</div>
+        <div class="product-name">Hard Case Pouch</div>
+        <p class="product-desc">Semi-rigid shell protects your pens and tools from crushing. Ideal for art students and designers.</p>
+        <div class="product-tags">
+          <span class="tag">Hard Shell</span>
+          <span class="tag">Extra Protection</span>
+          <span class="tag">Stylish</span>
+        </div>
+        <div class="product-footer">
+          <div class="price">₹99–₹129 <span>/ piece</span></div>
+          <button class="add-btn" onclick="addToCart('Hard Case Pouch')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img bg4">
+        <span>🗃️</span>
+      </div>
+      <div class="product-body">
+        <div class="product-type">Pro</div>
+        <div class="product-name">Multi-Compartment Pouch</div>
+        <p class="product-desc">Multiple pockets for ultra-organized storage. The go-to choice for students with lots of tools.</p>
+        <div class="product-tags">
+          <span class="tag">Multi-Pocket</span>
+          <span class="tag">Large Capacity</span>
+          <span class="tag">Organized</span>
+        </div>
+        <div class="product-footer">
+          <div class="price">₹120–₹149 <span>/ piece</span></div>
+          <button class="add-btn" onclick="addToCart('Multi-Compartment Pouch')">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why">
+  <div class="why-grid">
+    <div>
+      <div class="section-label">The PouchCo Promise</div>
+      <div class="section-title">More than just<br>a pencil case</div>
+      <p class="section-sub">We obsess over every stitch, zipper, and finish so you don't have to think twice before buying.</p>
+      <div class="why-points">
+        <div class="why-point">
+          <div class="why-dot">🏭</div>
+          <div>
+            <h4>Quality Manufacturing</h4>
+            <p>Each pouch goes through a multi-step quality check before it reaches you — cutting, sealing, zipper testing, and final inspection.</p>
+          </div>
+        </div>
+        <div class="why-point">
+          <div class="why-dot">🚀</div>
+          <div>
+            <h4>Fast Online Delivery</h4>
+            <p>Order from home and receive at your doorstep. Available via our website, Instagram shop, and WhatsApp orders.</p>
+          </div>
+        </div>
+        <div class="why-point">
+          <div class="why-dot">🌿</div>
+          <div>
+            <h4>Reusable & Long-lasting</h4>
+            <p>Our pouches are made to last the entire academic year, reducing waste and saving you money in the long run.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="why-visual">
+      <div class="why-tile t1">
+        <div class="icon">🎓</div>
+        <div class="big">500+</div>
+        <div class="small">Students served this semester</div>
+      </div>
+      <div class="why-tile t2">
+        <div class="icon">⭐</div>
+        <div class="big">4.8</div>
+        <div class="small">Average rating</div>
+      </div>
+      <div class="why-tile t3">
+        <div class="icon">📦</div>
+        <div class="big">4</div>
+        <div class="small">Unique pouch styles</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews" style="padding-bottom:0">
+  <div style="text-align:center; margin-bottom:3rem;">
+    <div class="section-label">Student Reviews</div>
+    <div class="section-title">Loved by students,<br>proven in classrooms</div>
+  </div>
+  <div style="overflow:hidden; padding:1rem 0 4rem;">
+    <div class="review-track" id="reviewTrack">
+      <!-- Set 1 -->
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"The printed pouch is so cute! I get compliments on it every day. The zipper is really smooth and it holds all my pens easily."</p>
+        <div class="reviewer"><div class="avatar" style="background:#e07b2a">P</div><div><div class="reviewer-name">Priya S.</div><div class="reviewer-role">Engineering Student</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Bought the multi-compartment one. Perfect for all my art supplies — brushes, pens, rulers, everything fits. Totally worth it!"</p>
+        <div class="reviewer"><div class="avatar" style="background:#2a7b6f">R</div><div><div class="reviewer-name">Rohan M.</div><div class="reviewer-role">Arts Student</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★☆</div>
+        <p class="review-text">"The transparent pouch is super convenient. I can always find what I need without digging around. Great quality for the price."</p>
+        <div class="reviewer"><div class="avatar" style="background:#9b59b6">A</div><div><div class="reviewer-name">Anaya K.</div><div class="reviewer-role">College Student</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"The hard case pouch saved my highlighters so many times. My bag gets squished in the bus but everything inside is still safe!"</p>
+        <div class="reviewer"><div class="avatar" style="background:#e74c3c">S</div><div><div class="reviewer-name">Sneha L.</div><div class="reviewer-role">School Student</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Ordered 3 for me and my friends. Delivery was fast and packaging was really nice. Will definitely order again next semester!"</p>
+        <div class="reviewer"><div class="avatar" style="background:#1abc9c">K</div><div><div class="reviewer-name">Kartik B.</div><div class="reviewer-role">IT Student</div></div></div>
+      </div>
+      <!-- Duplicate for infinite scroll -->
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"The printed pouch is so cute! I get compliments on it every day. The zipper is really smooth and it holds all my pens easily."</p>
+        <div class="reviewer"><div class="avatar" style="background:#e07b2a">P</div><div><div class="reviewer-name">Priya S.</div><div class="reviewer-role">Engineering Student</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Bought the multi-compartment one. Perfect for all my art supplies — brushes, pens, rulers, everything fits. Totally worth it!"</p>
+        <div class="reviewer"><div class="avatar" style="background:#2a7b6f">R</div><div><div class="reviewer-name">Rohan M.</div><div class="reviewer-role">Arts Student</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★☆</div>
+        <p class="review-text">"The transparent pouch is super convenient. I can always find what I need without digging around. Great quality for the price."</p>
+        <div class="reviewer"><div class="avatar" style="background:#9b59b6">A</div><div><div class="reviewer-name">Anaya K.</div><div class="reviewer-role">College Student</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"The hard case pouch saved my highlighters so many times. My bag gets squished in the bus but everything inside is still safe!"</p>
+        <div class="reviewer"><div class="avatar" style="background:#e74c3c">S</div><div><div class="reviewer-name">Sneha L.</div><div class="reviewer-role">School Student</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Ordered 3 for me and my friends. Delivery was fast and packaging was really nice. Will definitely order again next semester!"</p>
+        <div class="reviewer"><div class="avatar" style="background:#1abc9c">K</div><div><div class="reviewer-name">Kartik B.</div><div class="reviewer-role">IT Student</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <h2>Ready to organize<br>your stationery? ✏️</h2>
+  <p>Order online today and get your pouch delivered to your doorstep.</p>
+  <div class="cta-actions">
+    <a href="#products" class="btn-white">🛍️ Shop All Pouches</a>
+    <a href="https://wa.me/" class="btn-outline-white">💬 WhatsApp Order</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">PouchCo</div>
+      <p>Affordable, durable, and stylish stationery pouches for school and college students across India.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="#products">Transparent Pouch</a></li>
+        <li><a href="#products">Printed Pouch</a></li>
+        <li><a href="#products">Hard Case Pouch</a></li>
+        <li><a href="#products">Multi-Compartment</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#">Amazon</a></li>
+        <li><a href="#">Flipkart</a></li>
+        <li><a href="#">Instagram Shop</a></li>
+        <li><a href="#">WhatsApp Order</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#">Track Order</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 PouchCo. Made with ❤️ for students.</p>
+    <div class="social-links">
+      <a href="#" title="Instagram">📸</a>
+      <a href="#" title="WhatsApp">💬</a>
+      <a href="#" title="YouTube">▶️</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast">🛍️ Added to cart!</div>
+
+<script>
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 30);
+  });
+
+  // Mobile menu
+  function openMenu() { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
+
+  // Add to cart toast
+  function addToCart(name) {
+    const toast = document.getElementById('toast');
+    toast.innerHTML = `🛍️ <strong>${name}</strong> added to cart!`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.feature-card, .product-card, .why-tile, .why-point').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
